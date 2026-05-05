@@ -103,7 +103,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 .hero-section { flex:1; display:flex; align-items:center; justify-content:center; padding:16px; position:relative; }
 .hero-board-wrap { position:relative; }
 .hero-board { width:min(280px,70vw,44vh); height:min(280px,70vw,44vh); display:grid; grid-template-columns:repeat(8,1fr); grid-template-rows:repeat(8,1fr); border:2px solid var(--border); border-radius:6px; overflow:hidden; box-shadow:0 8px 40px var(--shadow), 0 0 0 1px rgba(0,0,0,.05); animation:float 4s ease-in-out infinite; }
-.hero-cell { display:flex; align-items:center; justify-content:center; font-size:min(28px,6vw,3.5vh); aspect-ratio:1/1; min-width:0; min-height:0; }
+.hero-cell { display:flex; align-items:center; justify-content:center; aspect-ratio:1/1; min-width:0; min-height:0; position:relative; }
 .hero-cell.light { background:var(--board-light); }
 .hero-cell.dark { background:var(--board-dark); }
 @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
@@ -194,13 +194,13 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 /* ═══════════════════════════════════ GAME SCREEN ══ */
 #game { background:var(--bg); }
 
-.game-header { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; background:var(--surface); border-bottom:1px solid var(--border); flex-shrink:0; box-shadow:0 1px 4px var(--shadow); }
+.game-header { display:flex; align-items:center; justify-content:space-between; padding:8px 16px; background:var(--surface); border-bottom:1px solid var(--border); flex-shrink:0; box-shadow:0 1px 4px var(--shadow); min-height:80px; }
 .game-logo { display:flex; align-items:center; gap:8px; }
 .game-logo .logo-rook { font-size:24px; }
 .game-logo .logo-text { font-size:22px; letter-spacing:3px; }
 .game-controls { display:flex; gap:6px; }
 
-.game-body { flex:1; display:flex; overflow:hidden; padding:10px; gap:10px; align-items:center; justify-content:center; min-height:0; }
+.game-body { flex:1; display:flex; overflow:hidden; padding:8px; align-items:center; justify-content:center; min-height:0; }
 
 /* ── SIDE PANELS ── */
 .side-panel { width:155px; flex-shrink:0; display:flex; flex-direction:column; gap:8px; height:100%; justify-content:space-between; overflow:hidden; }
@@ -242,17 +242,17 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 
 .board-outer { position:relative; }
 .board {
-  /* Stable size — CSS calc only, never JS-driven */
+  /* No side panels, no footer — board can be much larger */
   --bsize: min(
-    calc(100vw - 360px),
-    calc(100vh - 140px),
-    580px
+    calc(100vw - 40px),
+    calc(100vh - 90px),
+    720px
   );
   width: var(--bsize);
   height: var(--bsize);
   display:grid;
   grid-template-columns:repeat(8, 1fr);
-  grid-template-rows:repeat(8, 1fr);  /* KEY: force equal row heights */
+  grid-template-rows:repeat(8, 1fr);
   border:2px solid var(--border);
   border-radius:5px;
   overflow:hidden;
@@ -281,19 +281,22 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 .cell.valid-move::before   { content:''; position:absolute; width:32%; height:32%; border-radius:50%; background:var(--move-dot); z-index:2; }
 .cell.valid-capture::before { content:''; position:absolute; inset:8%; border-radius:50%; border:3px solid var(--capture-ring); z-index:2; background:transparent; }
 
-/* Piece: sized relative to cell via font-size, NO layout impact */
+/* Piece: two-tone unicode badge, fills cell */
 .piece {
-  font-size:calc(var(--bsize) / 9.5);
-  line-height:1;
+  position:absolute;
+  inset:5%;
   z-index:1;
   pointer-events:none;
-  filter:drop-shadow(0 1px 2px rgba(0,0,0,.3));
-  position:relative;
-  /* Prevent piece from changing cell size */
-  display:block;
-  width:100%; text-align:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
-[data-dark="on"] .piece { filter:drop-shadow(0 2px 4px rgba(0,0,0,.6)); }
+.piece svg {
+  width:100%;
+  height:100%;
+  display:block;
+  overflow:visible;
+}
 
 /* Bot thinking */
 .bot-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.12); border-radius:5px; opacity:0; pointer-events:none; transition:opacity .2s; z-index:10; }
@@ -304,17 +307,73 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 .dot:nth-child(2){animation-delay:.2s} .dot:nth-child(3){animation-delay:.4s}
 @keyframes dotpulse { 0%,80%,100%{transform:scale(0);opacity:.3} 40%{transform:scale(1);opacity:1} }
 
-/* ── STATUS ── */
-.game-status { padding:8px 16px; background:var(--surface); border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; gap:8px; box-shadow:0 -1px 4px var(--shadow); }
-.status-text { font-family:var(--font-mono); font-size:10px; color:var(--muted); letter-spacing:.5px; flex:1; text-align:center; }
-.status-text.alert { color:var(--accent); }
-.status-text.danger { color:var(--danger); }
-.timer-box { background:var(--surface2); border:1px solid var(--border); border-radius:5px; padding:5px 10px; font-family:var(--font-mono); font-size:12px; color:var(--text2); min-width:54px; text-align:center; letter-spacing:2px; }
-.timer-box.active { border-color:var(--accent); color:var(--accent); }
+/* ── PLAYER BAR ── */
+.player-bar {
+  flex:1; display:flex; align-items:center; justify-content:center;
+  gap:16px; padding:0 12px; min-width:0;
+}
 
-/* Autoplay bar */
-.autoplay-bar { display:flex; gap:6px; align-items:center; background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:4px 10px; }
-.autoplay-bar .label-mono { color:var(--accent); }
+/* Individual player slot */
+.pb-player {
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  min-width:0; flex-shrink:0;
+}
+
+/* Avatar — large, no background, just the image/initial floating */
+.pb-avatar {
+  width:56px; height:56px; border-radius:50%;
+  overflow:hidden; flex-shrink:0;
+  transition:box-shadow .3s;
+  position:relative;
+}
+.pb-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; display:block; }
+.pb-avatar .pb-init {
+  width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display); font-size:26px; color:var(--text2);
+  border-radius:50%;
+}
+
+/* Glow states */
+.pb-avatar.turn-active {
+  box-shadow: 0 0 0 3px #e53935, 0 0 18px 6px rgba(229,57,53,.55);
+  animation: pulse-red 1.1s ease-in-out infinite alternate;
+}
+.pb-avatar.turn-waiting {
+  box-shadow: 0 0 0 2px #2e7d32, 0 0 12px 4px rgba(46,125,50,.4);
+}
+@keyframes pulse-red {
+  from { box-shadow: 0 0 0 3px #e53935, 0 0 14px 4px rgba(229,57,53,.45); }
+  to   { box-shadow: 0 0 0 3px #ff5252, 0 0 26px 10px rgba(255,82,82,.65); }
+}
+
+.pb-name {
+  font-family:var(--font-display); font-size:13px; letter-spacing:1.5px;
+  color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  max-width:80px; text-align:center;
+}
+.pb-captured {
+  display:flex; flex-wrap:wrap; gap:1px; justify-content:center;
+  max-width:80px; min-height:14px;
+}
+
+/* Centre info block */
+.pb-centre {
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  flex-shrink:0;
+}
+.pb-info-row { display:flex; align-items:center; gap:5px; }
+.pb-chip {
+  font-family:var(--font-mono); font-size:9px; letter-spacing:.5px;
+  color:var(--muted); background:var(--surface2); border:1px solid var(--border);
+  border-radius:20px; padding:2px 7px; white-space:nowrap;
+}
+.pb-chip.alert { color:var(--accent); border-color:var(--accent); }
+.pb-chip.danger { color:var(--danger); border-color:var(--danger); }
+.pb-score-label { font-family:var(--font-mono); font-size:8px; color:var(--muted); }
+.pb-score { font-family:var(--font-mono); font-size:10px; color:var(--accent); }
+.autoplay-inline { display:flex; gap:5px; align-items:center; }
+
+/* ── BOARD: now fills full height minus just the header ── */
 
 /* ── FOCUS MODE ── */
 #focusScreen { background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; }
@@ -339,7 +398,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 .focus-board .cell.in-check::after      { content:''; position:absolute; inset:0; background:var(--check); }
 .focus-board .cell.valid-move::before   { content:''; position:absolute; width:30%; height:30%; border-radius:50%; background:var(--move-dot); z-index:2; }
 .focus-board .cell.valid-capture::before { content:''; position:absolute; inset:8%; border-radius:50%; border:4px solid var(--capture-ring); z-index:2; background:transparent; }
-.focus-board .piece { font-size:calc(var(--fbsize)/9); line-height:1; z-index:1; pointer-events:none; filter:drop-shadow(0 2px 4px rgba(0,0,0,.4)); display:block; width:100%; text-align:center; }
+.focus-board .piece { position:absolute; inset:4%; z-index:1; pointer-events:none; display:flex; align-items:center; justify-content:center; }
 .focus-status { font-family:var(--font-mono); font-size:11px; color:var(--muted); letter-spacing:1px; }
 
 /* ── PROMOTION ── */
@@ -361,9 +420,19 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 .result-sub { font-family:var(--font-mono); font-size:10px; color:var(--muted); letter-spacing:1px; }
 
 /* ── RESPONSIVE ── */
-@media (max-width:900px) { .side-panel{display:none} .board{--bsize:min(calc(100vw - 20px),calc(100vh - 150px),520px)} }
-@media (max-width:600px) { .game-header{padding:8px 12px} .board{--bsize:min(calc(100vw - 12px),calc(100vh - 130px))} .game-body{padding:6px;gap:0} }
-@media (min-width:901px) and (max-width:1100px) { .side-panel{width:130px} .board{--bsize:min(calc(100vw - 290px),calc(100vh - 140px),500px)} }
+@media (max-width:600px) {
+  .game-header { padding:6px 10px; }
+  .pb-avatar { width:44px; height:44px; }
+  .pb-name { font-size:11px; max-width:60px; }
+  .board { --bsize: min(calc(100vw - 12px), calc(100vh - 100px)); }
+  .game-body { padding:4px; }
+  .logo-text { font-size:16px; }
+  .pb-chip { font-size:8px; padding:1px 5px; }
+}
+@media (min-width:601px) and (max-width:900px) {
+  .pb-avatar { width:50px; height:50px; }
+  .board { --bsize: min(calc(100vw - 20px), calc(100vh - 95px), 620px); }
+}
 
 /* In-game theme dots (rebuild) */
 .ig-theme-dot { width:22px; height:22px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:all .2s; }
@@ -376,7 +445,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 .ig-theme-dot[data-theme="walnut"]  { background:conic-gradient(#e8d5a0 50%,#7a4a1a 50%); }
 </style>
 </head>
-<body data-theme="classic" data-dark="off">
+<body data-theme="carbon" data-dark="off">
 
 <!-- ═══════════════════════════════════ LANDING ══ -->
 <div class="screen" id="landing">
@@ -433,49 +502,68 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 
 <!-- ═══════════════════════════════════ GAME ══ -->
 <div class="screen hidden" id="game">
+
+  <!-- HEADER: logo | player1 — info — player2 | controls -->
   <div class="game-header">
+
+    <!-- Logo -->
     <div class="game-logo">
       <span class="logo-rook">♜</span>
       <span class="logo-text accent">CHESS<span style="color:var(--text2)">.</span></span>
     </div>
-    <div id="autoplayBar" class="autoplay-bar" style="display:none">
-      <div class="label-mono">AUTOPLAY</div>
-      <div class="thinking-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+
+    <!-- Player bar (sits in middle of header) -->
+    <div class="player-bar">
+      <!-- White player -->
+      <div class="pb-player" id="pbWhite">
+        <div class="pb-avatar" id="pbWhiteAv"></div>
+        <div class="pb-name" id="pbWhiteName">WHITE</div>
+        <div class="pb-captured" id="pbWhiteCap"></div>
+      </div>
+
+      <!-- Centre info -->
+      <div class="pb-centre">
+        <div class="pb-info-row">
+          <span class="pb-chip" id="modeChip">PvP</span>
+          <span class="pb-chip" id="movesChip">0</span>
+          <span class="pb-chip" id="statusText">WHITE</span>
+        </div>
+        <div class="pb-info-row" style="margin-top:3px">
+          <span class="pb-score-label">W</span>
+          <span class="pb-score" id="whiteScore">0</span>
+          <span class="pb-score-label" style="margin-left:6px">B</span>
+          <span class="pb-score" id="blackScore">0</span>
+        </div>
+        <div id="autoplayBar" class="autoplay-inline" style="display:none">
+          <div class="thinking-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <span class="pb-score-label">AUTO</span>
+        </div>
+      </div>
+
+      <!-- Black player -->
+      <div class="pb-player" id="pbBlack">
+        <div class="pb-avatar" id="pbBlackAv"></div>
+        <div class="pb-name" id="pbBlackName">BLACK</div>
+        <div class="pb-captured" id="pbBlackCap"></div>
+      </div>
     </div>
+
+    <!-- Controls -->
     <div class="game-controls">
       <div class="icon-btn" id="undoBtn" title="Undo">↩</div>
-      <div class="icon-btn" id="focusBtn" title="Focus Mode">⊞</div>
+      <div class="icon-btn" id="focusBtn" title="Focus Mode — board only">⊞</div>
+      <div class="icon-btn" id="gameFullscreenBtn" title="Fullscreen — whole app">⛶</div>
       <div class="icon-btn" id="flipBtn" title="Flip Board">⇅</div>
       <div class="icon-btn" id="downloadBtn" title="Download Moves">⬇</div>
       <div class="icon-btn" id="menuBtn" title="Menu">☰</div>
     </div>
   </div>
 
+  <!-- BOARD ONLY — no side panels, no footer -->
   <div class="game-body">
-    <!-- LEFT -->
-    <div class="side-panel">
-      <div class="info-card" id="topPlayerCard">
-        <div class="panel-avatar" id="topPanelAv"><span style="font-size:16px">♟</span></div>
-        <div class="panel-name" id="topPanelName">BLACK</div>
-        <div class="turn-indicator"><div class="turn-dot black" id="topDot"></div><div class="label-mono" id="topTag">WAITING</div></div>
-        <div class="captured-pieces" id="topCaptured"></div>
-      </div>
-      <div class="move-history-wrap">
-        <div class="label-mono" style="margin-bottom:5px;flex-shrink:0">MOVES</div>
-        <div class="move-list" id="moveListLeft"></div>
-      </div>
-      <div class="info-card" id="bottomPlayerCard">
-        <div class="panel-avatar" id="botPanelAv"><span style="font-size:16px">♙</span></div>
-        <div class="panel-name" id="botPanelName">WHITE</div>
-        <div class="turn-indicator"><div class="turn-dot white" id="botDot"></div><div class="label-mono" id="botTag">YOUR TURN</div></div>
-        <div class="captured-pieces" id="botCaptured"></div>
-      </div>
-    </div>
-
-    <!-- BOARD -->
     <div class="board-area">
       <div class="board-with-coords">
-        <div class="coords-col" id="coordsLeft" style="height:0"></div><!-- height set by JS after measure -->
+        <div class="coords-col" id="coordsLeft" style="height:0"></div>
         <div class="board-outer">
           <div class="board" id="board">
             <div class="bot-overlay" id="botOverlay">
@@ -486,35 +574,8 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
         </div>
       </div>
     </div>
-
-    <!-- RIGHT -->
-    <div class="side-panel">
-      <div class="info-card">
-        <div class="label-mono">GAME INFO</div>
-        <div class="divider"></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px"><span class="label-mono">MODE</span><span class="chip accent" id="modeChip">PvP</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:center"><span class="label-mono">TURN</span><span class="chip" id="turnChip">WHITE</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:center"><span class="label-mono">MOVES</span><span class="chip" id="movesChip">0</span></div>
-      </div>
-      <div class="info-card">
-        <div class="label-mono">MATERIAL</div>
-        <div class="divider"></div>
-        <div style="display:flex;justify-content:space-between"><span class="label-mono">WHITE</span><span id="whiteScore" style="font-family:var(--font-mono);font-size:11px;color:var(--accent)">0</span></div>
-        <div style="display:flex;justify-content:space-between"><span class="label-mono">BLACK</span><span id="blackScore" style="font-family:var(--font-mono);font-size:11px;color:var(--text2)">0</span></div>
-      </div>
-      <div class="info-card" style="flex:1;min-height:0;overflow:hidden">
-        <div class="label-mono" style="flex-shrink:0">HISTORY</div>
-        <div class="divider" style="flex-shrink:0;margin-bottom:4px"></div>
-        <div class="move-list" id="moveListRight"></div>
-      </div>
-    </div>
   </div>
 
-  <div class="game-status">
-    <div class="timer-box" id="timerWhite">—</div>
-    <div class="status-text" id="statusText">WHITE TO MOVE</div>
-    <div class="timer-box" id="timerBlack">—</div>
-  </div>
 </div>
 
 <!-- ═══════════════════════════════════ FOCUS MODE ══ -->
@@ -663,7 +724,7 @@ let S = {
   botColor:'black', botDepth:1,
   fredAutoplay:false, fredDiff:2,
   botThinking:false, promotionOpen:false,
-  theme:'classic', dark:false, fullscreen:false,
+  theme:'carbon', dark:false, fullscreen:false,
   inFocus:false,
   // Setup temps
   pvpP1:null, pvpP2:null, pvbP:null,
@@ -672,7 +733,61 @@ let S = {
 };
 
 // ═══════════════════════════════════════════════ CHESS ENGINE ══
-const SYMBOLS = {wK:'♔',wQ:'♕',wR:'♖',wB:'♗',wN:'♘',wP:'♙',bK:'♚',bQ:'♛',bR:'♜',bB:'♝',bN:'♞',bP:'♟'};
+
+// ── TWO-TONE UNICODE PIECES ──
+// White pieces: ivory fill + dark border badge, black glyph
+// Black pieces: dark fill + light border badge, white glyph
+// Uses standard chess unicode — rendered large, centered, crisp
+
+const PIECE_SVG = (()=>{
+  const GLYPHS = {
+    wK:'♔', wQ:'♕', wR:'♖', wB:'♗', wN:'♘', wP:'♙',
+    bK:'♚', bQ:'♛', bR:'♜', bB:'♝', bN:'♞', bP:'♟'
+  };
+
+  // Two-tone badge: circle background + unicode glyph on top
+  // White pieces: off-white disc, dark glyph, subtle ring
+  // Black pieces: near-black disc, light glyph, subtle ring
+  function make(piece){
+    const isW = piece[0] === 'w';
+    const glyph = GLYPHS[piece] || '';
+
+    const disc     = isW ? '#f5f2ec' : '#1e2124';
+    const ring     = isW ? '#2a2d30' : '#c8cdd2';
+    const glyphCol = isW ? '#1a1c1f' : '#edeae5';
+    const shadow   = isW ? 'rgba(0,0,0,.28)' : 'rgba(0,0,0,.55)';
+    const shine    = isW ? 'rgba(255,255,255,.55)' : 'rgba(255,255,255,.10)';
+
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 45 45" style="width:100%;height:100%;display:block;overflow:visible">
+  <defs>
+    <filter id="ds${piece}" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.5" flood-color="${shadow}"/>
+    </filter>
+    <radialGradient id="sh${piece}" cx="38%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="${shine}"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+  </defs>
+  <!-- Disc -->
+  <circle cx="22.5" cy="23" r="18.5" fill="${disc}" stroke="${ring}" stroke-width="1.8" filter="url(#ds${piece})"/>
+  <!-- Shine -->
+  <circle cx="22.5" cy="23" r="18.5" fill="url(#sh${piece})"/>
+  <!-- Glyph -->
+  <text x="22.5" y="30.5" text-anchor="middle" font-size="26"
+    font-family="'Segoe UI Symbol','Apple Color Emoji','Symbola',serif"
+    fill="${glyphCol}" style="user-select:none">${glyph}</text>
+</svg>`;
+  }
+
+  const cache = {};
+  return {
+    get(piece){
+      if(!piece) return '';
+      if(cache[piece]) return cache[piece];
+      return cache[piece] = make(piece);
+    }
+  };
+})();
 const VALS = {P:1,N:3,B:3,R:5,Q:9,K:0};
 let enPassantTarget=null;
 let castlingRights={wK:true,wQ:true,bK:true,bQ:true};
@@ -888,18 +1003,25 @@ function moveSAN(board,fr,fc,tr,tc,md,promo){
 // ═══════════════════════════════════════════════ RENDERING ══
 
 function makeAvatarEl(player, size=44){
+  // No bg box, no border — just the image or initial floating
   const wrap = document.createElement('div');
-  wrap.style.cssText=`width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--surface2);border:2px solid var(--border);flex-shrink:0;`;
+  wrap.style.cssText=`width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;`;
   if(player && player.photo){
     const img=document.createElement('img');
     img.src=player.photo;
-    img.alt=player.name;
-    img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';
-    img.onerror=()=>{ wrap.innerHTML=''; const span=document.createElement('span'); span.style.cssText=`font-family:var(--font-display);font-size:${Math.round(size*.45)}px;color:var(--text2);`; span.textContent=(player.name||'?')[0].toUpperCase(); wrap.appendChild(span); };
+    img.alt=player.name||'';
+    img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;';
+    img.onerror=()=>{
+      wrap.innerHTML='';
+      const span=document.createElement('span');
+      span.style.cssText=`font-family:var(--font-display);font-size:${Math.round(size*.48)}px;color:var(--text2);line-height:1;`;
+      span.textContent=(player.name||'?')[0].toUpperCase();
+      wrap.appendChild(span);
+    };
     wrap.appendChild(img);
   } else {
     const span=document.createElement('span');
-    span.style.cssText=`font-family:var(--font-display);font-size:${Math.round(size*.45)}px;color:var(--text2);`;
+    span.style.cssText=`font-family:var(--font-display);font-size:${Math.round(size*.48)}px;color:var(--text2);line-height:1;`;
     span.textContent=player?(player.name||'?')[0].toUpperCase():'?';
     wrap.appendChild(span);
   }
@@ -957,7 +1079,7 @@ function renderBoard(){
       if(piece){
         const pd=document.createElement('div');
         pd.className='piece';
-        pd.textContent=SYMBOLS[piece]||'';
+        pd.innerHTML=PIECE_SVG.get(piece);
         cell.appendChild(pd);
       }
       cell.addEventListener('click',()=>handleCellClick(r,c));
@@ -980,69 +1102,75 @@ function renderBoard(){
 
 function updateStatus(){
   const el=document.getElementById('statusText');
-  const tc=document.getElementById('turnChip');
-  const mc=document.getElementById('movesChip');
-  if(tc) tc.textContent=S.turn.toUpperCase();
-  if(mc) mc.textContent=S.moveHistory.length;
-  if(!el||S.gameOver)return;
-  if(S.inCheck){ el.textContent=S.turn.toUpperCase()+' IN CHECK!'; el.className='status-text danger'; }
-  else{ el.textContent=S.turn.toUpperCase()+' TO MOVE'; el.className='status-text'; }
+  if(!el) return;
+  if(S.gameOver){ el.textContent='GAME OVER'; el.className='pb-chip'; return; }
+  if(S.inCheck){
+    el.textContent=S.turn.toUpperCase()+' CHECK!';
+    el.className='pb-chip danger';
+  } else {
+    el.textContent=S.turn.toUpperCase()+' TO MOVE';
+    el.className='pb-chip';
+  }
 }
 
 function updateSidePanels(){
-  const topColor=S.boardFlipped?'white':'black';
-  const botColor2=S.boardFlipped?'black':'white';
-  const topP=S.players[topColor], botP=S.players[botColor2];
+  // Determine which color is on which side
+  // White is always "left", black "right" in the player bar (regardless of board flip)
+  const wP = S.players.white;
+  const bP = S.players.black;
+  const wActive = S.turn === 'white';
+  const bActive = S.turn === 'black';
 
-  // Top player
-  const topAv=document.getElementById('topPanelAv');
-  if(topAv){ topAv.innerHTML=''; topAv.appendChild(makeAvatarEl(topP,36)); }
-  document.getElementById('topPanelName').textContent=(topP?.name||'?').toUpperCase();
-  const topActive=S.turn===topColor;
-  document.getElementById('topPlayerCard').className='info-card'+(topActive?' active-player-card':'');
-  document.getElementById('topTag').textContent=topActive?'YOUR TURN':'WAITING';
+  // Update white avatar
+  const wAv = document.getElementById('pbWhiteAv');
+  if(wAv){ wAv.innerHTML=''; wAv.appendChild(makeAvatarEl(wP, 56)); }
+  // Update black avatar
+  const bAv = document.getElementById('pbBlackAv');
+  if(bAv){ bAv.innerHTML=''; bAv.appendChild(makeAvatarEl(bP, 56)); }
 
-  // Bot player
-  const botAv=document.getElementById('botPanelAv');
-  if(botAv){ botAv.innerHTML=''; botAv.appendChild(makeAvatarEl(botP,36)); }
-  document.getElementById('botPanelName').textContent=(botP?.name||'?').toUpperCase();
-  const botActive=S.turn===botColor2;
-  document.getElementById('bottomPlayerCard').className='info-card'+(botActive?' active-player-card':'');
-  document.getElementById('botTag').textContent=botActive?'YOUR TURN':'WAITING';
+  // Names
+  const wN=document.getElementById('pbWhiteName');
+  const bN=document.getElementById('pbBlackName');
+  if(wN) wN.textContent=(wP?.name||'WHITE').toUpperCase();
+  if(bN) bN.textContent=(bP?.name||'BLACK').toUpperCase();
 
-  // Captured
-  document.getElementById('topCaptured').innerHTML=S.capturedByWhite.map(p=>`<span>${SYMBOLS[p]||''}</span>`).join('');
-  document.getElementById('botCaptured').innerHTML=S.capturedByBlack.map(p=>`<span>${SYMBOLS[p]||''}</span>`).join('');
+  // Glow: red pulse = active turn, green steady = waiting
+  const wAvEl=document.getElementById('pbWhiteAv');
+  const bAvEl=document.getElementById('pbBlackAv');
+  if(wAvEl){
+    wAvEl.classList.toggle('turn-active', wActive);
+    wAvEl.classList.toggle('turn-waiting', !wActive);
+  }
+  if(bAvEl){
+    bAvEl.classList.toggle('turn-active', bActive);
+    bAvEl.classList.toggle('turn-waiting', !bActive);
+  }
 
-  // Material
+  // Captured pieces
+  function capHTML(pieces){
+    return pieces.map(p=>`<span style="display:inline-block;width:16px;height:16px;position:relative;flex-shrink:0;">${PIECE_SVG.get(p)}</span>`).join('');
+  }
+  const wCap=document.getElementById('pbWhiteCap');
+  const bCap=document.getElementById('pbBlackCap');
+  if(wCap) wCap.innerHTML=capHTML(S.capturedByWhite);
+  if(bCap) bCap.innerHTML=capHTML(S.capturedByBlack);
+
+  // Material scores
   const wm=S.capturedByWhite.reduce((a,p)=>a+(VALS[p[1]]||0),0);
   const bm=S.capturedByBlack.reduce((a,p)=>a+(VALS[p[1]]||0),0);
-  document.getElementById('whiteScore').textContent=wm;
-  document.getElementById('blackScore').textContent=bm;
+  const wSc=document.getElementById('whiteScore');
+  const bSc=document.getElementById('blackScore');
+  if(wSc) wSc.textContent=wm;
+  if(bSc) bSc.textContent=bm;
 
-  renderMoveHistory();
+  // Moves count
+  const mc=document.getElementById('movesChip');
+  if(mc) mc.textContent=S.moveHistory.length+' moves';
+
+  // Mode chip
+  const mChip=document.getElementById('modeChip');
+  if(mChip) mChip.textContent=S.mode==='pvp'?'PvP':'vs BOT';
 }
-
-function renderMoveHistory(){
-  ['moveListLeft','moveListRight'].forEach(id=>{
-    const ml=document.getElementById(id); if(!ml)return;
-    ml.innerHTML='';
-    for(let i=0;i<S.moveHistory.length;i+=2){
-      const pair=document.createElement('div');
-      pair.className='move-pair';
-      const n=document.createElement('span'); n.className='move-num'; n.textContent=`${i/2+1}.`;
-      const m1=document.createElement('span'); m1.className='move-san'+(i===S.moveHistory.length-1?' active':''); m1.textContent=S.moveHistory[i].san||'';
-      pair.appendChild(n); pair.appendChild(m1);
-      if(S.moveHistory[i+1]){
-        const m2=document.createElement('span'); m2.className='move-san'+(i+1===S.moveHistory.length-1?' active':''); m2.textContent=S.moveHistory[i+1].san||'';
-        pair.appendChild(m2);
-      }
-      ml.appendChild(pair);
-    }
-    ml.scrollTop=ml.scrollHeight;
-  });
-}
-
 // ─── FOCUS BOARD ───
 function renderFocusBoard(){
   const fb=document.getElementById('focusBoard');
@@ -1063,7 +1191,7 @@ function renderFocusBoard(){
         if(p[1]==='K'&&(p[0]==='w'?'white':'black')===S.turn) cell.classList.add('in-check');
       }
       const piece=S.board[r][c];
-      if(piece){const pd=document.createElement('div');pd.className='piece';pd.textContent=SYMBOLS[piece]||'';cell.appendChild(pd);}
+      if(piece){const pd=document.createElement('div');pd.className='piece';pd.innerHTML=PIECE_SVG.get(piece);cell.appendChild(pd);}
       cell.addEventListener('click',()=>handleCellClick(r,c));
       fb.appendChild(cell);
     }
@@ -1127,11 +1255,15 @@ function showPromotion(color,fr,fc,tr,tc,md){
   const pp=document.getElementById('promoPieces');
   pp.innerHTML='';
   const types=['Q','R','B','N'];
-  const syms=color==='white'?['♕','♖','♗','♘']:['♛','♜','♝','♞'];
-  types.forEach((t,i)=>{
+  const pc=color==='white'?'w':'b';
+  types.forEach((t)=>{
     const btn=document.createElement('div');
-    btn.className='promo-piece'; btn.textContent=syms[i];
+    btn.className='promo-piece';
+    btn.innerHTML=PIECE_SVG.get(pc+t);
+    btn.style.cssText='position:relative;width:64px;height:64px;background:var(--surface2);border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;overflow:hidden;';
     btn.onclick=()=>{ modal.classList.remove('open'); S.promotionOpen=false; doMove(fr,fc,tr,tc,md,t); };
+    btn.onmouseenter=()=>{ btn.style.borderColor='var(--accent)'; btn.style.transform='scale(1.1)'; };
+    btn.onmouseleave=()=>{ btn.style.borderColor='var(--border)'; btn.style.transform=''; };
     pp.appendChild(btn);
   });
   modal.classList.add('open');
@@ -1143,7 +1275,7 @@ function scheduleBotMove(isFred){
   const color=isFred?(S.botColor==='white'?'black':'white'):S.botColor;
   document.getElementById('botOverlay').classList.add('show');
   const st=document.getElementById('statusText');
-  if(st){st.textContent=isFred?'FRED THINKING...':'BOT THINKING...';st.className='status-text alert';}
+  if(st){st.textContent=isFred?'FRED...':'BOT...';st.className='pb-chip alert';}
   if(isFred) document.getElementById('autoplayBar').style.display='flex';
 
   const ep=enPassantTarget,cr={...castlingRights};
@@ -1166,7 +1298,7 @@ function showResult(title,winner,name){
   document.getElementById('resultIcon').textContent=title==='CHECKMATE'?'♔':title==='RESIGN'?'🏳':'½';
   document.getElementById('resultModal').classList.add('open');
   const st=document.getElementById('statusText');
-  if(st){st.textContent=title+'!';st.className='status-text danger';}
+  if(st){st.textContent=title+'!';st.className='pb-chip danger';}
 }
 
 // ═══════════════════════════════════════════════ GAME SETUP ══
@@ -1180,7 +1312,6 @@ function startGame(cfg){
   Object.assign(S, cfg);
   S.inFocus=false;
 
-  document.getElementById('modeChip').textContent=cfg.mode==='pvp'?'PvP':'vs BOT';
   document.getElementById('autoplayBar').style.display='none';
   document.getElementById('resultModal').classList.remove('open');
 
@@ -1312,7 +1443,7 @@ function renderHeroBoard(){
   INIT.forEach((p,i)=>{
     const d=document.createElement('div');
     d.className='hero-cell '+((Math.floor(i/8)+i%8)%2===0?'light':'dark');
-    if(p)d.textContent=SYMBOLS[p]||'';
+    if(p){ const pd=document.createElement('div'); pd.className='piece'; pd.innerHTML=PIECE_SVG.get(p); d.appendChild(pd); }
     hb.appendChild(d);
   });
 }
@@ -1469,6 +1600,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('downloadBtn').onclick=downloadMoves;
   document.getElementById('focusBtn').onclick=enterFocus;
   document.getElementById('focusExitBtn').onclick=exitFocus;
+  document.getElementById('gameFullscreenBtn').onclick=toggleFullscreen;
 
   // Menu
   document.getElementById('menuBtn').onclick=()=>{
@@ -1501,11 +1633,13 @@ document.addEventListener('DOMContentLoaded',()=>{
     mo.addEventListener('click',e=>{if(e.target===mo)mo.classList.remove('open');});
   });
 
-  // Fullscreen listener
+  // Fullscreen listener — sync landing + game buttons
   document.addEventListener('fullscreenchange',()=>{
     const isFs=!!document.fullscreenElement;
-    document.getElementById('fullscreenBtn').classList.toggle('active',isFs);
-    document.getElementById('fullscreenBtn').textContent=isFs?'⛶':'⛶';
+    ['fullscreenBtn','gameFullscreenBtn'].forEach(id=>{
+      const el=document.getElementById(id); if(!el)return;
+      el.classList.toggle('active',isFs);
+    });
   });
 
   // Keyboard
