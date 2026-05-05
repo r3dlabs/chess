@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CHESS</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♜</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -101,8 +102,8 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 /* HERO */
 .hero-section { flex:1; display:flex; align-items:center; justify-content:center; padding:16px; position:relative; }
 .hero-board-wrap { position:relative; }
-.hero-board { width:min(280px,70vw,44vh); height:min(280px,70vw,44vh); display:grid; grid-template-columns:repeat(8,1fr); border:2px solid var(--border); border-radius:6px; overflow:hidden; box-shadow:0 8px 40px var(--shadow), 0 0 0 1px rgba(0,0,0,.05); animation:float 4s ease-in-out infinite; }
-.hero-cell { display:flex; align-items:center; justify-content:center; font-size:min(28px,6vw,3.5vh); }
+.hero-board { width:min(280px,70vw,44vh); height:min(280px,70vw,44vh); display:grid; grid-template-columns:repeat(8,1fr); grid-template-rows:repeat(8,1fr); border:2px solid var(--border); border-radius:6px; overflow:hidden; box-shadow:0 8px 40px var(--shadow), 0 0 0 1px rgba(0,0,0,.05); animation:float 4s ease-in-out infinite; }
+.hero-cell { display:flex; align-items:center; justify-content:center; font-size:min(28px,6vw,3.5vh); aspect-ratio:1/1; min-width:0; min-height:0; }
 .hero-cell.light { background:var(--board-light); }
 .hero-cell.dark { background:var(--board-dark); }
 @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
@@ -250,17 +251,28 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
   width: var(--bsize);
   height: var(--bsize);
   display:grid;
-  grid-template-columns:repeat(8,1fr);
+  grid-template-columns:repeat(8, 1fr);
+  grid-template-rows:repeat(8, 1fr);  /* KEY: force equal row heights */
   border:2px solid var(--border);
   border-radius:5px;
   overflow:hidden;
   box-shadow:0 4px 24px var(--shadow);
-  /* ensure the board never resizes due to content */
   flex-shrink:0;
 }
 
-/* each cell fills exactly 1/8 of the board via grid, with NO content overflow */
-.cell { position:relative; display:flex; align-items:center; justify-content:center; cursor:pointer; overflow:hidden; }
+/* Cells: perfectly square via aspect-ratio + contain content */
+.cell {
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  overflow:hidden;
+  /* Force square — grid-template-rows handles height, this is a safety net */
+  aspect-ratio:1 / 1;
+  min-width:0;
+  min-height:0;
+}
 .cell.light { background:var(--board-light); }
 .cell.dark  { background:var(--board-dark); }
 .cell.selected::after      { content:''; position:absolute; inset:0; background:var(--highlight); pointer-events:none; }
@@ -312,12 +324,14 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 .focus-board {
   --fbsize: min(calc(100vw - 32px), calc(100vh - 80px), 800px);
   width:var(--fbsize); height:var(--fbsize);
-  display:grid; grid-template-columns:repeat(8,1fr);
+  display:grid;
+  grid-template-columns:repeat(8, 1fr);
+  grid-template-rows:repeat(8, 1fr);
   border:3px solid var(--border); border-radius:6px; overflow:hidden;
   box-shadow:0 8px 40px var(--shadow);
   flex-shrink:0;
 }
-.focus-board .cell { position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden; cursor:pointer; }
+.focus-board .cell { position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden; cursor:pointer; aspect-ratio:1/1; min-width:0; min-height:0; }
 .focus-board .cell.light { background:var(--board-light); }
 .focus-board .cell.dark  { background:var(--board-dark); }
 .focus-board .cell.selected::after      { content:''; position:absolute; inset:0; background:var(--highlight); }
