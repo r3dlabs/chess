@@ -90,9 +90,8 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 .landing-header { display:flex; align-items:center; justify-content:space-between; padding:20px 24px 0; }
 
 .logo { display:flex; align-items:center; gap:10px; text-decoration:none; }
-.logo-rook { font-size:32px; line-height:1; }
+.logo-rook { font-size:32px; line-height:1; color:#111 !important; }
 .logo-text { font-family:var(--font-display); font-size:clamp(28px,5vw,42px); letter-spacing:4px; color:var(--accent); line-height:1; }
-.logo-text span { color:var(--text2); }
 
 .header-controls { display:flex; gap:8px; }
 .icon-btn { width:38px; height:38px; background:var(--surface); border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--muted); transition:all .2s; font-size:16px; box-shadow:0 1px 3px var(--shadow); }
@@ -125,7 +124,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 
 /* ACTION AREA */
 .action-area { padding:16px 24px; display:flex; flex-direction:column; gap:10px; }
-.mode-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.mode-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
 .mode-card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); padding:16px; cursor:pointer; transition:all .22s; display:flex; flex-direction:column; gap:5px; box-shadow:0 1px 4px var(--shadow); }
 .mode-card:hover { border-color:var(--accent); transform:translateY(-2px); box-shadow:0 4px 16px var(--shadow); }
 .mode-card:active { transform:scale(.98); }
@@ -196,14 +195,74 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 
 .game-header { display:flex; align-items:center; justify-content:space-between; padding:8px 16px; background:var(--surface); border-bottom:1px solid var(--border); flex-shrink:0; box-shadow:0 1px 4px var(--shadow); min-height:80px; }
 .game-logo { display:flex; align-items:center; gap:8px; }
-.game-logo .logo-rook { font-size:24px; }
+.game-logo .logo-rook { font-size:24px; color:#111 !important; }
 .game-logo .logo-text { font-size:22px; letter-spacing:3px; }
 .game-controls { display:flex; gap:6px; }
 
 .game-body { flex:1; display:flex; overflow:hidden; padding:8px; align-items:center; justify-content:center; min-height:0; }
 
 /* ── SIDE PANELS ── */
-.side-panel { width:155px; flex-shrink:0; display:flex; flex-direction:column; gap:8px; height:100%; justify-content:space-between; overflow:hidden; }
+.side-panel {
+  width:155px; flex-shrink:0; display:flex; flex-direction:column;
+  gap:8px; height:100%; justify-content:space-between; overflow:hidden;
+  animation: slideInPanel .22s ease;
+}
+@keyframes slideInPanel { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
+
+/* Side panel sub-components */
+.sp-player-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; padding:10px;
+  display:flex; flex-direction:column; align-items:center; gap:5px;
+  box-shadow:0 1px 3px var(--shadow); flex-shrink:0;
+}
+.sp-avatar {
+  width:44px; height:44px; border-radius:50%; overflow:hidden;
+  flex-shrink:0; transition:box-shadow .3s;
+}
+.sp-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; display:block; }
+.sp-avatar.turn-active { box-shadow:0 0 0 3px #e53935,0 0 18px 6px rgba(229,57,53,.55); animation:pulse-red 1.1s ease-in-out infinite alternate; }
+.sp-avatar.turn-waiting { box-shadow:0 0 0 2px #2e7d32,0 0 12px 4px rgba(46,125,50,.4); }
+.sp-name { font-family:var(--font-display); font-size:13px; letter-spacing:1px; color:var(--text); }
+.sp-captured { display:flex; flex-wrap:wrap; gap:1px; justify-content:center; min-height:14px; }
+.sp-move-wrap {
+  flex:1; overflow:hidden; display:flex; flex-direction:column;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; padding:8px; min-height:0;
+  box-shadow:0 1px 3px var(--shadow);
+}
+.sp-move-list {
+  display:flex; flex-direction:column; gap:3px;
+  overflow-y:auto; flex:1;
+}
+.sp-move-list::-webkit-scrollbar { width:3px; }
+.sp-move-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+.sp-score-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; padding:10px; flex-shrink:0;
+  box-shadow:0 1px 3px var(--shadow); display:flex; flex-direction:column; gap:3px;
+}
+
+/* ── FOCUS MODE PLAYER STRIP ── */
+.focus-players {
+  display:flex; align-items:center; justify-content:space-between;
+  width:var(--fbsize); padding:0 4px; margin-bottom:8px;
+}
+.focus-player {
+  display:flex; align-items:center; gap:10px;
+}
+.focus-player.right { flex-direction:row-reverse; }
+.focus-avatar {
+  width:52px; height:52px; border-radius:50%; overflow:hidden;
+  flex-shrink:0; transition:box-shadow .3s;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display); font-size:24px; color:var(--text2);
+}
+.focus-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; display:block; }
+.focus-avatar.turn-active { box-shadow:0 0 0 3px #e53935,0 0 20px 8px rgba(229,57,53,.6); animation:pulse-red 1.1s ease-in-out infinite alternate; }
+.focus-avatar.turn-waiting { box-shadow:0 0 0 2px #2e7d32,0 0 14px 5px rgba(46,125,50,.45); }
+.focus-pname { font-family:var(--font-display); font-size:15px; letter-spacing:1.5px; color:var(--text); }
+.focus-pcolor { font-family:var(--font-mono); font-size:9px; color:var(--muted); letter-spacing:1px; }
 .info-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:10px; display:flex; flex-direction:column; gap:5px; box-shadow:0 1px 3px var(--shadow); }
 .info-card.active-player-card { border-color:var(--accent); box-shadow:0 0 14px rgba(200,168,0,.18); }
 [data-dark="on"] .info-card.active-player-card { box-shadow:0 0 16px rgba(232,255,0,.14); }
@@ -220,6 +279,10 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 .move-list { display:flex; flex-direction:column; gap:3px; overflow-y:auto; flex:1; }
 .move-list::-webkit-scrollbar { width:3px; }
 .move-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+.move-pair { display:flex; gap:4px; align-items:center; font-family:var(--font-mono); font-size:9px; }
+.move-num { color:var(--muted); width:16px; flex-shrink:0; }
+.move-san { flex:1; padding:2px 5px; border-radius:3px; color:var(--text2); transition:background .12s; }
+.move-san.active { background:var(--surface3); color:var(--accent); }
 .move-pair { display:flex; gap:4px; align-items:center; font-family:var(--font-mono); font-size:9px; }
 .move-num { color:var(--muted); width:16px; flex-shrink:0; }
 .move-san { flex:1; padding:2px 5px; border-radius:3px; color:var(--text2); transition:background .12s; }
@@ -242,12 +305,13 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 
 .board-outer { position:relative; }
 .board {
-  /* No side panels, no footer — board can be much larger */
+  /* Board size — adapts whether panels are shown or not */
   --bsize: min(
     calc(100vw - 40px),
     calc(100vh - 90px),
     720px
   );
+  /* Overridden via .panels-open below */
   width: var(--bsize);
   height: var(--bsize);
   display:grid;
@@ -258,6 +322,14 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
   overflow:hidden;
   box-shadow:0 4px 24px var(--shadow);
   flex-shrink:0;
+}
+/* When side panels are open, shrink board */
+.panels-open .board {
+  --bsize: min(
+    calc(100vw - 350px),
+    calc(100vh - 90px),
+    560px
+  );
 }
 
 /* Cells: perfectly square via aspect-ratio + contain content */
@@ -452,7 +524,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
   <div class="landing-header">
     <a class="logo" href="#" onclick="return false">
       <span class="logo-rook">♜</span>
-      <span class="logo-text">CHESS<span>.</span></span>
+      <span class="logo-text">CHESS</span>
     </a>
     <div class="header-controls">
       <div class="icon-btn" id="darkToggle" title="Dark/Light">☀️</div>
@@ -487,6 +559,11 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
         <div class="mode-title">PvP</div>
         <div class="mode-desc">TWO PLAYERS<br>SAME DEVICE</div>
       </div>
+      <div class="mode-card" id="onlineBtn">
+        <div class="mode-icon">🌐</div>
+        <div class="mode-title">ONLINE</div>
+        <div class="mode-desc">PLAY OVER<br>THE NETWORK</div>
+      </div>
       <div class="mode-card" id="pvbBtn">
         <div class="mode-icon">🤖</div>
         <div class="mode-title">vs BOT</div>
@@ -509,7 +586,7 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
     <!-- Logo -->
     <div class="game-logo">
       <span class="logo-rook">♜</span>
-      <span class="logo-text accent">CHESS<span style="color:var(--text2)">.</span></span>
+      <span class="logo-text">CHESS</span>
     </div>
 
     <!-- Player bar (sits in middle of header) -->
@@ -538,6 +615,10 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
           <div class="thinking-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
           <span class="pb-score-label">AUTO</span>
         </div>
+        <div id="onlineStatusBar" class="autoplay-inline" style="display:none">
+          <div class="thinking-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <span class="pb-score-label" id="onlineStatusText">CONNECTING...</span>
+        </div>
       </div>
 
       <!-- Black player -->
@@ -551,6 +632,8 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
     <!-- Controls -->
     <div class="game-controls">
       <div class="icon-btn" id="undoBtn" title="Undo">↩</div>
+      <div class="icon-btn" id="panelsBtn" title="Toggle Side Panels">▤</div>
+      <div class="icon-btn" id="autoplayToggleBtn" title="Toggle Fred Autoplay" style="display:none">⚡</div>
       <div class="icon-btn" id="focusBtn" title="Focus Mode — board only">⊞</div>
       <div class="icon-btn" id="gameFullscreenBtn" title="Fullscreen — whole app">⛶</div>
       <div class="icon-btn" id="flipBtn" title="Flip Board">⇅</div>
@@ -559,8 +642,32 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
     </div>
   </div>
 
-  <!-- BOARD ONLY — no side panels, no footer -->
+  <!-- BOARD + COLLAPSIBLE SIDE PANELS -->
   <div class="game-body">
+
+    <!-- LEFT PANEL: White player moves -->
+    <div class="side-panel" id="leftPanel" style="display:none">
+      <div class="sp-player-card" id="spWhiteCard">
+        <div class="sp-avatar" id="spWhiteAv"></div>
+        <div class="sp-name" id="spWhiteName">WHITE</div>
+        <div class="sp-captured" id="spWhiteCap"></div>
+      </div>
+      <div class="sp-move-wrap">
+        <div class="label-mono" style="margin-bottom:5px;flex-shrink:0">MOVES</div>
+        <div class="sp-move-list" id="moveListLeft"></div>
+      </div>
+      <div class="sp-score-card">
+        <div class="label-mono">MATERIAL</div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px">
+          <span class="label-mono">WHITE</span><span id="spWhiteScore" style="font-family:var(--font-mono);font-size:11px;color:var(--accent)">0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span class="label-mono">BLACK</span><span id="spBlackScore" style="font-family:var(--font-mono);font-size:11px;color:var(--text2)">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOARD -->
     <div class="board-area">
       <div class="board-with-coords">
         <div class="coords-col" id="coordsLeft" style="height:0"></div>
@@ -574,6 +681,29 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
         </div>
       </div>
     </div>
+
+    <!-- RIGHT PANEL: Black player + move history -->
+    <div class="side-panel" id="rightPanel" style="display:none">
+      <div class="sp-player-card" id="spBlackCard">
+        <div class="sp-avatar" id="spBlackAv"></div>
+        <div class="sp-name" id="spBlackName">BLACK</div>
+        <div class="sp-captured" id="spBlackCap"></div>
+      </div>
+      <div class="sp-move-wrap">
+        <div class="label-mono" style="margin-bottom:5px;flex-shrink:0">HISTORY</div>
+        <div class="sp-move-list" id="moveListRight"></div>
+      </div>
+      <div class="sp-score-card">
+        <div class="label-mono">GAME INFO</div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px">
+          <span class="label-mono">MODE</span><span class="chip accent" id="spModeChip">PvP</span>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span class="label-mono">MOVES</span><span id="spMovesChip" style="font-family:var(--font-mono);font-size:11px;color:var(--text2)">0</span>
+        </div>
+      </div>
+    </div>
+
   </div>
 
 </div>
@@ -582,8 +712,30 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
 <div class="screen hidden" id="focusScreen">
   <button class="focus-exit-btn" id="focusExitBtn">✕ EXIT FOCUS</button>
   <div class="focus-board-wrap">
+    <!-- Top player (black by default, white if flipped) -->
+    <div class="focus-players" id="focusTopRow">
+      <div class="focus-player" id="focusTopPlayer">
+        <div class="focus-avatar" id="focusTopAv"></div>
+        <div>
+          <div class="focus-pname" id="focusTopName">BLACK</div>
+          <div class="focus-pcolor" id="focusTopColor">♟ BLACK</div>
+        </div>
+      </div>
+      <div class="pb-chip" id="focusStatus">BLACK TO MOVE</div>
+    </div>
+
     <div class="focus-board" id="focusBoard"></div>
-    <div class="focus-status" id="focusStatus">WHITE TO MOVE</div>
+
+    <!-- Bottom player (white by default, black if flipped) -->
+    <div class="focus-players" style="margin-top:8px;margin-bottom:0">
+      <div class="focus-player" id="focusBotPlayer">
+        <div class="focus-avatar" id="focusBotAv"></div>
+        <div>
+          <div class="focus-pname" id="focusBotName">WHITE</div>
+          <div class="focus-pcolor" id="focusBotColor">♙ WHITE</div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -641,16 +793,45 @@ body::before { content:''; position:fixed; inset:0; background-image:url("data:i
         <div class="skill-btn" data-diff="3">👑 EXPERT</div>
       </div>
     </div>
-    <div class="field-group" id="fredAutoSection" style="display:none">
-      <div class="field-label" style="color:var(--accent)">⚡ FRED AUTOPLAY SKILL</div>
-      <div class="skill-picker" id="fredDiffPicker">
-        <div class="skill-btn" data-frediff="1">🌱 BEGINNER</div>
-        <div class="skill-btn selected" data-frediff="2">⚔ INTER</div>
-        <div class="skill-btn" data-frediff="3">👑 EXPERT</div>
-      </div>
-    </div>
     <button class="btn-primary" id="pvbStartBtn">START GAME</button>
     <button class="btn-ghost" id="pvbCancelBtn">CANCEL</button>
+  </div>
+</div>
+
+<!-- Online PvP Setup -->
+<div class="modal-overlay" id="onlineModal">
+  <div class="modal">
+    <div class="modal-title">ONLINE PvP</div>
+    <div class="field-group">
+      <div class="field-label">YOUR PLAYER</div>
+      <div class="player-select-list" id="onlineSelectList"></div>
+    </div>
+    <div class="field-group" id="onlineFredPassWrap" style="display:none">
+      <div class="field-label">FRED'S PASSWORD</div>
+      <input class="field-input" id="onlineFredPassInput" type="password" placeholder="••••••••">
+      <div class="error-msg" id="onlineFredPassErr">⚠ INCORRECT PASSWORD</div>
+    </div>
+    <div class="divider"></div>
+    <div class="field-group">
+      <div class="field-label">JOIN OR CREATE</div>
+      <div class="skill-picker">
+        <div class="skill-btn selected" data-online="create">✦ CREATE ROOM</div>
+        <div class="skill-btn" data-online="join">→ JOIN ROOM</div>
+      </div>
+    </div>
+    <div class="field-group" id="onlineJoinCodeWrap" style="display:none">
+      <div class="field-label">ROOM CODE</div>
+      <input class="field-input" id="onlineJoinCode" placeholder="6-DIGIT CODE" maxlength="6" style="letter-spacing:4px;text-transform:uppercase;font-size:18px;text-align:center">
+      <div class="error-msg" id="onlineJoinErr">⚠ ROOM NOT FOUND OR EXPIRED</div>
+    </div>
+    <div id="onlineRoomDisplay" style="display:none">
+      <div class="field-label">YOUR ROOM CODE — SHARE WITH OPPONENT</div>
+      <div id="onlineRoomCode" style="font-family:var(--font-display);font-size:36px;letter-spacing:8px;color:var(--accent);text-align:center;padding:12px 0;"></div>
+      <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);text-align:center;letter-spacing:.5px">WAITING FOR OPPONENT TO JOIN...</div>
+      <div class="thinking-dots" style="justify-content:center;margin-top:8px"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    </div>
+    <button class="btn-primary" id="onlineConnectBtn">CREATE ROOM</button>
+    <button class="btn-ghost" id="onlineCancelBtn">CANCEL</button>
   </div>
 </div>
 
@@ -714,22 +895,27 @@ const NAMED_PLAYERS = [
 
 // ═══════════════════════════════════════════════ STATE ══
 let S = {
-  mode:'pvp',
-  players:{ white:NAMED_PLAYERS[0], black:NAMED_PLAYERS[1] },
+  mode:'pvp',           // 'pvp' | 'pvbot' | 'online'
+  players:{ white:NAMED_PLAYERS[0], black:NAMED_PLAYERS[3] },
   board:null, turn:'white',
   selected:null, validMoves:[],
   moveHistory:[], capturedByWhite:[], capturedByBlack:[],
   lastMove:null, inCheck:false, gameOver:false,
   boardFlipped:false,
   botColor:'black', botDepth:1,
-  fredAutoplay:false, fredDiff:2,
+  fredAutoplay:false, fredDiff:2, fredIsPlaying:false,
   botThinking:false, promotionOpen:false,
   theme:'carbon', dark:false, fullscreen:false,
   inFocus:false,
+  panelsVisible:false,
   // Setup temps
-  pvpP1:null, pvpP2:null, pvbP:null,
+  pvpP1:null, pvpP2:null, pvbP:null, onlineP:null,
   pvbColor:'white', botDiff:1, fredDiffSel:2,
   pvpFredChecked:false,
+  // Online PvP
+  onlineRole:'create',   // 'create' | 'join'
+  onlineMyColor:'white',
+  peer:null, conn:null,
 };
 
 // ═══════════════════════════════════════════════ CHESS ENGINE ══
@@ -1169,7 +1355,80 @@ function updateSidePanels(){
 
   // Mode chip
   const mChip=document.getElementById('modeChip');
-  if(mChip) mChip.textContent=S.mode==='pvp'?'PvP':'vs BOT';
+  if(mChip) mChip.textContent=S.mode==='pvp'?'PvP':S.mode==='online'?'ONLINE':'vs BOT';
+
+  // ── Side panel updates (if visible) ──
+  // SP avatars
+  function setSpAvatar(elId, player, isActive){
+    const el=document.getElementById(elId); if(!el)return;
+    el.innerHTML='';
+    if(player&&player.photo){
+      const img=document.createElement('img');
+      img.src=player.photo; img.alt=player.name||'';
+      img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;';
+      img.onerror=()=>{el.innerHTML='';const sp=document.createElement('span');sp.style.cssText='font-family:var(--font-display);font-size:20px;color:var(--text2);';sp.textContent=(player.name||'?')[0].toUpperCase();el.appendChild(sp);};
+      el.appendChild(img);
+    } else {
+      const sp=document.createElement('span');
+      sp.style.cssText='font-family:var(--font-display);font-size:20px;color:var(--text2);';
+      sp.textContent=player?(player.name||'?')[0].toUpperCase():'?';
+      el.appendChild(sp);
+    }
+    el.className='sp-avatar '+(isActive?'turn-active':'turn-waiting');
+  }
+  setSpAvatar('spWhiteAv', S.players.white, S.turn==='white');
+  setSpAvatar('spBlackAv', S.players.black, S.turn==='black');
+  const swn=document.getElementById('spWhiteName'); if(swn) swn.textContent=(S.players.white?.name||'WHITE').toUpperCase();
+  const sbn=document.getElementById('spBlackName'); if(sbn) sbn.textContent=(S.players.black?.name||'BLACK').toUpperCase();
+
+  // SP captured
+  function spCapHTML(pieces){ return pieces.map(p=>`<span style="display:inline-block;width:14px;height:14px;position:relative;">${PIECE_SVG.get(p)}</span>`).join(''); }
+  const swc=document.getElementById('spWhiteCap'); if(swc) swc.innerHTML=spCapHTML(S.capturedByWhite);
+  const sbc=document.getElementById('spBlackCap'); if(sbc) sbc.innerHTML=spCapHTML(S.capturedByBlack);
+
+  // SP scores
+  const sws=document.getElementById('spWhiteScore'); if(sws) sws.textContent=wm;
+  const sbs=document.getElementById('spBlackScore'); if(sbs) sbs.textContent=bm;
+
+  // SP mode/moves
+  const smc=document.getElementById('spModeChip'); if(smc) smc.textContent=S.mode==='pvp'?'PvP':S.mode==='online'?'ONLINE':'vs BOT';
+  const smv=document.getElementById('spMovesChip'); if(smv) smv.textContent=S.moveHistory.length;
+
+  // Render move lists
+  renderMoveLists();
+}
+
+function renderMoveLists(){
+  ['moveListLeft','moveListRight'].forEach(id=>{
+    const ml=document.getElementById(id); if(!ml)return;
+    ml.innerHTML='';
+    for(let i=0;i<S.moveHistory.length;i+=2){
+      const pair=document.createElement('div');
+      pair.className='move-pair';
+      const n=document.createElement('span'); n.className='move-num'; n.textContent=`${i/2+1}.`;
+      const m1=document.createElement('span'); m1.className='move-san'+(i===S.moveHistory.length-1?' active':''); m1.textContent=S.moveHistory[i].san||'';
+      pair.appendChild(n); pair.appendChild(m1);
+      if(S.moveHistory[i+1]){
+        const m2=document.createElement('span'); m2.className='move-san'+(i+1===S.moveHistory.length-1?' active':''); m2.textContent=S.moveHistory[i+1].san||'';
+        pair.appendChild(m2);
+      }
+      ml.appendChild(pair);
+    }
+    ml.scrollTop=ml.scrollHeight;
+  });
+}
+
+function togglePanels(){
+  S.panelsVisible=!S.panelsVisible;
+  const lp=document.getElementById('leftPanel');
+  const rp=document.getElementById('rightPanel');
+  const btn=document.getElementById('panelsBtn');
+  const gb=document.querySelector('.game-body');
+  if(lp) lp.style.display=S.panelsVisible?'flex':'none';
+  if(rp) rp.style.display=S.panelsVisible?'flex':'none';
+  if(btn) btn.classList.toggle('active', S.panelsVisible);
+  if(gb) gb.classList.toggle('panels-open', S.panelsVisible);
+  if(S.panelsVisible) renderMoveLists();
 }
 // ─── FOCUS BOARD ───
 function renderFocusBoard(){
@@ -1196,8 +1455,44 @@ function renderFocusBoard(){
       fb.appendChild(cell);
     }
   }
+
+  // Update focus player strips
+  // Top = black (default) or white (flipped)
+  const topColor = fl?'white':'black';
+  const botColor = fl?'black':'white';
+  const topP = S.players[topColor];
+  const botP = S.players[botColor];
+  const topActive = S.turn===topColor;
+  const botActive = S.turn===botColor;
+
+  function setFocusAvatar(elId, player, isActive){
+    const el=document.getElementById(elId); if(!el)return;
+    el.innerHTML='';
+    if(player&&player.photo){
+      const img=document.createElement('img');
+      img.src=player.photo; img.alt=player.name||'';
+      img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;';
+      img.onerror=()=>{el.innerHTML='';el.textContent=(player.name||'?')[0].toUpperCase();};
+      el.appendChild(img);
+    } else {
+      el.textContent=player?(player.name||'?')[0].toUpperCase():'?';
+    }
+    el.className='focus-avatar '+(isActive?'turn-active':'turn-waiting');
+  }
+
+  setFocusAvatar('focusTopAv', topP, topActive);
+  setFocusAvatar('focusBotAv', botP, botActive);
+
+  const tn=document.getElementById('focusTopName'); if(tn) tn.textContent=(topP?.name||topColor).toUpperCase();
+  const bn=document.getElementById('focusBotName'); if(bn) bn.textContent=(botP?.name||botColor).toUpperCase();
+  const tc=document.getElementById('focusTopColor'); if(tc) tc.textContent=(topColor==='white'?'♙ WHITE':'♟ BLACK');
+  const bc=document.getElementById('focusBotColor'); if(bc) bc.textContent=(botColor==='white'?'♙ WHITE':'♟ BLACK');
+
   const fs=document.getElementById('focusStatus');
-  if(fs) fs.textContent=S.inCheck?S.turn.toUpperCase()+' IN CHECK!':(S.turn.toUpperCase()+' TO MOVE');
+  if(fs){
+    if(S.inCheck){ fs.textContent=S.turn.toUpperCase()+' IN CHECK!'; fs.className='pb-chip danger'; }
+    else { fs.textContent=S.turn.toUpperCase()+' TO MOVE'; fs.className='pb-chip'; }
+  }
 }
 
 // ═══════════════════════════════════════════════ GAME LOGIC ══
@@ -1219,7 +1514,7 @@ function handleCellClick(r,c){
   }
 }
 
-function doMove(fr,fc,tr,tc,md,promo){
+function doMove(fr,fc,tr,tc,md,promo,fromOnline){
   const p=S.board[fr][fc];
   const isPromo=p[1]==='P'&&(tr===0||tr===7);
   if(isPromo&&!promo){ showPromotion(p[0]==='w'?'white':'black',fr,fc,tr,tc,md); return; }
@@ -1246,7 +1541,8 @@ function doMove(fr,fc,tr,tc,md,promo){
   renderBoard();
 
   if(S.mode==='pvbot'&&S.turn===S.botColor&&!S.gameOver) scheduleBotMove(false);
-  if(S.fredAutoplay&&S.mode==='pvbot'&&!S.gameOver&&S.turn!==S.botColor) scheduleBotMove(true);
+  if(S.fredAutoplay&&S.fredIsPlaying&&S.mode==='pvbot'&&!S.gameOver&&S.turn!==S.botColor) scheduleBotMove(true);
+  if(S.mode==='online'&&!S.gameOver&&!fromOnline) onlineSendMove({fr,fc,tr,tc,md:md||{},promo});
 }
 
 function showPromotion(color,fr,fc,tr,tc,md){
@@ -1276,19 +1572,29 @@ function scheduleBotMove(isFred){
   document.getElementById('botOverlay').classList.add('show');
   const st=document.getElementById('statusText');
   if(st){st.textContent=isFred?'FRED...':'BOT...';st.className='pb-chip alert';}
-  if(isFred) document.getElementById('autoplayBar').style.display='flex';
+  if(isFred){ document.getElementById('autoplayBar').style.display='flex'; S.fredIsPlaying=true; }
 
   const ep=enPassantTarget,cr={...castlingRights};
   const delay=depth===1?200:depth===2?500:900;
   setTimeout(()=>{
     S.botThinking=false;
     document.getElementById('botOverlay').classList.remove('show');
-    if(!isFred) document.getElementById('autoplayBar').style.display='none';
+    if(isFred) document.getElementById('autoplayBar').style.display='none';
     if(!S.gameOver){
       const m=getBotMove(cloneBoard(S.board),color,depth,ep,cr);
       if(m){ S.selected=null; S.validMoves=[]; doMove(m.fr,m.fc,m.tr,m.tc,m,'Q'); }
     }
   },delay);
+}
+
+function toggleFredAutoplay(){
+  if(!S.fredAutoplay) return;
+  S.fredIsPlaying=!S.fredIsPlaying;
+  const btn=document.getElementById('autoplayToggleBtn');
+  if(btn){ btn.classList.toggle('active', S.fredIsPlaying); btn.title=S.fredIsPlaying?'Stop Autoplay':'Start Autoplay'; }
+  if(S.fredIsPlaying && !S.gameOver && S.turn!==S.botColor && !S.botThinking){
+    scheduleBotMove(true);
+  }
 }
 
 function showResult(title,winner,name){
@@ -1307,16 +1613,38 @@ function startGame(cfg){
   S.selected=null; S.validMoves=[];
   S.moveHistory=[]; S.capturedByWhite=[]; S.capturedByBlack=[];
   S.lastMove=null; S.inCheck=false; S.gameOver=false; S.botThinking=false; S.promotionOpen=false;
+  S.fredIsPlaying=false;
   enPassantTarget=null; castlingRights={wK:true,wQ:true,bK:true,bQ:true};
 
   Object.assign(S, cfg);
   S.inFocus=false;
+  S.panelsVisible=false;
 
   document.getElementById('autoplayBar').style.display='none';
+  document.getElementById('onlineStatusBar').style.display='none';
   document.getElementById('resultModal').classList.remove('open');
+
+  // Fred autoplay toggle button — only visible for Fred in pvbot
+  const apBtn=document.getElementById('autoplayToggleBtn');
+  if(apBtn){
+    const showAp = S.fredAutoplay && S.mode==='pvbot';
+    apBtn.style.display=showAp?'flex':'none';
+    apBtn.classList.remove('active');
+    apBtn.title='Start Autoplay';
+  }
 
   // Update landing avatars
   setLandingPlayers(S.players.white, S.players.black);
+
+  // Reset panels
+  const lp2=document.getElementById('leftPanel');
+  const rp2=document.getElementById('rightPanel');
+  const gb2=document.querySelector('.game-body');
+  const pb2=document.getElementById('panelsBtn');
+  if(lp2) lp2.style.display='none';
+  if(rp2) rp2.style.display='none';
+  if(gb2) gb2.classList.remove('panels-open');
+  if(pb2) pb2.classList.remove('active');
 
   showScreen('game');
   renderBoard();
@@ -1392,18 +1720,17 @@ function updateFredFields(){
   // PvP
   const pvpFredNeeded=(S.pvpP1?.isFred||S.pvpP2?.isFred);
   const pvpWrap=document.getElementById('pvpFredPassWrap');
-  if(pvpWrap) pvpWrap.style.display=pvpFredNeeded?'flex':'none';
-  if(pvpWrap) pvpWrap.style.flexDirection='column';
-  if(pvpWrap) pvpWrap.style.gap='7px';
+  if(pvpWrap){pvpWrap.style.display=pvpFredNeeded?'flex':'none';pvpWrap.style.flexDirection='column';pvpWrap.style.gap='7px';}
 
   // PvBot
   const pvbFredNeeded=S.pvbP?.isFred;
   const pvbWrap=document.getElementById('pvbFredPassWrap');
-  if(pvbWrap){ pvbWrap.style.display=pvbFredNeeded?'flex':'none'; pvbWrap.style.flexDirection='column'; pvbWrap.style.gap='7px'; }
-  const fredAutoSec=document.getElementById('fredAutoSection');
-  if(fredAutoSec) fredAutoSec.style.display=pvbFredNeeded?'flex':'none';
-  if(fredAutoSec) fredAutoSec.style.flexDirection='column';
-  if(fredAutoSec) fredAutoSec.style.gap='7px';
+  if(pvbWrap){pvbWrap.style.display=pvbFredNeeded?'flex':'none';pvbWrap.style.flexDirection='column';pvbWrap.style.gap='7px';}
+
+  // Online
+  const onlineFredNeeded=S.onlineP?.isFred;
+  const onlineWrap=document.getElementById('onlineFredPassWrap');
+  if(onlineWrap){onlineWrap.style.display=onlineFredNeeded?'flex':'none';onlineWrap.style.flexDirection='column';onlineWrap.style.gap='7px';}
 }
 
 // ═══════════════════════════════════════════════ THEME / DARK ══
@@ -1501,13 +1828,14 @@ function undoMove(){
 // ═══════════════════════════════════════════════ INIT ══
 document.addEventListener('DOMContentLoaded',()=>{
   // Defaults
-  S.pvpP1=NAMED_PLAYERS[0];
-  S.pvpP2=NAMED_PLAYERS[1];
-  S.pvbP=NAMED_PLAYERS[0];
+  S.pvpP1=NAMED_PLAYERS[0];  // Fred
+  S.pvpP2=NAMED_PLAYERS[3];  // Skai
+  S.pvbP=NAMED_PLAYERS[0];   // Fred
+  S.onlineP=NAMED_PLAYERS[0]; // Fred
 
   renderHeroBoard();
   buildThemePicker('landingThemePicker','theme-dot');
-  setLandingPlayers(NAMED_PLAYERS[0],NAMED_PLAYERS[1]);
+  setLandingPlayers(NAMED_PLAYERS[0],NAMED_PLAYERS[3]);
 
   // Dark toggle (landing)
   document.getElementById('darkToggle').onclick=()=>setDark(!S.dark);
@@ -1524,6 +1852,67 @@ document.addEventListener('DOMContentLoaded',()=>{
     updateFredFields();
     document.getElementById('pvpModal').classList.add('open');
   };
+
+  // Online PvP button
+  document.getElementById('onlineBtn').onclick=()=>{
+    buildPlayerSelectList('onlineSelectList','onlineP',false);
+    S.onlineRole='create';
+    document.getElementById('onlineJoinCodeWrap').style.display='none';
+    document.getElementById('onlineRoomDisplay').style.display='none';
+    document.getElementById('onlineConnectBtn').style.display='';
+    document.getElementById('onlineConnectBtn').textContent='CREATE ROOM';
+    document.getElementById('onlineFredPassInput').value='';
+    document.getElementById('onlineFredPassErr').classList.remove('show');
+    // Reset join/create toggle
+    document.querySelectorAll('[data-online]').forEach(b=>{
+      b.classList.toggle('selected', b.dataset.online==='create');
+    });
+    updateFredFields();
+    document.getElementById('onlineModal').classList.add('open');
+  };
+
+  // Online join/create toggle
+  document.querySelectorAll('[data-online]').forEach(b=>{
+    b.onclick=()=>{
+      S.onlineRole=b.dataset.online;
+      document.querySelectorAll('[data-online]').forEach(x=>x.classList.remove('selected'));
+      b.classList.add('selected');
+      const joining=S.onlineRole==='join';
+      document.getElementById('onlineJoinCodeWrap').style.display=joining?'flex':'none';
+      if(joining) document.getElementById('onlineJoinCodeWrap').style.flexDirection='column';
+      document.getElementById('onlineJoinCodeWrap').style.gap='7px';
+      document.getElementById('onlineConnectBtn').textContent=joining?'JOIN ROOM':'CREATE ROOM';
+      document.getElementById('onlineRoomDisplay').style.display='none';
+    };
+  });
+
+  // Online connect button
+  document.getElementById('onlineConnectBtn').onclick=()=>{
+    const player=S.onlineP;
+    if(!player){alert('Select a player first.');return;}
+    if(player.isFred){
+      const pw=document.getElementById('onlineFredPassInput').value;
+      if(pw!==FRED_PASS){document.getElementById('onlineFredPassErr').classList.add('show');return;}
+    }
+    loadPeerJS(()=>{
+      cleanupOnline();
+      if(S.onlineRole==='create'){
+        onlineCreateRoom(player);
+      } else {
+        const code=document.getElementById('onlineJoinCode').value.trim();
+        if(code.length<4){alert('Enter a valid room code.');return;}
+        document.getElementById('onlineJoinErr').classList.remove('show');
+        onlineJoinRoom(code, player);
+      }
+    });
+  };
+  document.getElementById('onlineCancelBtn').onclick=()=>{
+    cleanupOnline();
+    document.getElementById('onlineModal').classList.remove('open');
+  };
+
+  // Fred autoplay toggle (in-game)
+  document.getElementById('autoplayToggleBtn').onclick=toggleFredAutoplay;
 
   // PvB button
   document.getElementById('pvbBtn').onclick=()=>{
@@ -1588,7 +1977,8 @@ document.addEventListener('DOMContentLoaded',()=>{
       mode:'pvbot',
       players:{ [pc]:S.pvbP, [botC]:botPlayer },
       botColor:botC, botDepth:S.botDiff,
-      fredAutoplay:S.pvbP.isFred, fredDiff:S.pvbP.isFred?S.fredDiffSel:S.botDiff,
+      fredAutoplay:S.pvbP.isFred, fredDiff:S.botDiff,
+      fredIsPlaying:false,
       boardFlipped:pc==='black'
     });
   };
@@ -1596,6 +1986,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   // In-game buttons
   document.getElementById('undoBtn').onclick=undoMove;
+  document.getElementById('panelsBtn').onclick=togglePanels;
   document.getElementById('flipBtn').onclick=()=>{S.boardFlipped=!S.boardFlipped;renderBoard();};
   document.getElementById('downloadBtn').onclick=downloadMoves;
   document.getElementById('focusBtn').onclick=enterFocus;
@@ -1612,10 +2003,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('menuDarkToggle').onclick=()=>setDark(!S.dark);
   document.getElementById('menuFlip').onclick=()=>{S.boardFlipped=!S.boardFlipped;renderBoard();document.getElementById('menuModal').classList.remove('open');};
   document.getElementById('menuDownloadBtn').onclick=()=>{downloadMoves();document.getElementById('menuModal').classList.remove('open');};
-  document.getElementById('menuNewGameBtn').onclick=()=>{document.getElementById('menuModal').classList.remove('open');showScreen('landing');};
+  document.getElementById('menuNewGameBtn').onclick=()=>{cleanupOnline();document.getElementById('menuModal').classList.remove('open');showScreen('landing');};
   document.getElementById('menuResignBtn').onclick=()=>{
     document.getElementById('menuModal').classList.remove('open');
     S.gameOver=true;
+    if(S.mode==='online'&&S.conn) S.conn.send({type:'resign'});
     const winner=opponent(S.turn);
     showResult('RESIGN',winner.toUpperCase()+' WINS',S.players[winner].name);
   };
@@ -1626,7 +2018,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     document.getElementById('resultModal').classList.remove('open');
     startGame({mode:S.mode,players:S.players,botColor:S.botColor,botDepth:S.botDepth,fredAutoplay:S.fredAutoplay,fredDiff:S.fredDiff,boardFlipped:S.boardFlipped});
   };
-  document.getElementById('resultMenuBtn').onclick=()=>{document.getElementById('resultModal').classList.remove('open');showScreen('landing');};
+  document.getElementById('resultMenuBtn').onclick=()=>{cleanupOnline();document.getElementById('resultModal').classList.remove('open');showScreen('landing');};
 
   // Close modals on backdrop click
   document.querySelectorAll('.modal-overlay').forEach(mo=>{
@@ -1655,6 +2047,120 @@ document.addEventListener('DOMContentLoaded',()=>{
 function toggleFullscreen(){
   if(!document.fullscreenElement)document.documentElement.requestFullscreen?.().catch(()=>{});
   else document.exitFullscreen?.();
+}
+
+// ═══════════════════════════════════════════════ ONLINE PvP (WebRTC via PeerJS) ══
+// Uses PeerJS signalling server (free, no setup needed)
+// Flow: Host creates room → gets 6-char code → shares with opponent → opponent joins
+
+let _peerJSLoaded = false;
+
+function loadPeerJS(cb){
+  if(window.Peer){ cb(); return; }
+  const s=document.createElement('script');
+  s.src='https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js';
+  s.onload=()=>{ _peerJSLoaded=true; cb(); };
+  s.onerror=()=>{ alert('Could not load networking library. Check your internet connection.'); };
+  document.head.appendChild(s);
+}
+
+function genRoomCode(){
+  return Math.random().toString(36).substr(2,6).toUpperCase();
+}
+
+function onlineCreateRoom(player){
+  const code = genRoomCode();
+  const peerId = 'CHESS-'+code;
+  document.getElementById('onlineRoomDisplay').style.display='block';
+  document.getElementById('onlineRoomCode').textContent=code;
+  document.getElementById('onlineConnectBtn').style.display='none';
+
+  const peer = new Peer(peerId, {debug:0});
+  S.peer=peer;
+  S.onlineMyColor='white';
+
+  peer.on('open', id=>{
+    console.log('Room open:', id);
+  });
+
+  peer.on('connection', conn=>{
+    S.conn=conn;
+    setupOnlineConn(conn, 'white', player);
+  });
+
+  peer.on('error', e=>{ console.error('Peer error:',e); });
+}
+
+function onlineJoinRoom(code, player){
+  const peerId = 'CHESS-'+code.toUpperCase();
+  const peer = new Peer(null, {debug:0});
+  S.peer=peer;
+  S.onlineMyColor='black';
+
+  peer.on('open', id=>{
+    const conn = peer.connect(peerId, {reliable:true});
+    S.conn=conn;
+    setupOnlineConn(conn, 'black', player);
+  });
+
+  peer.on('error', e=>{
+    document.getElementById('onlineJoinErr').classList.add('show');
+    console.error('Join error:',e);
+  });
+}
+
+function setupOnlineConn(conn, myColor, player){
+  const botPlayer={id:'online-opp',name:'Opponent',photo:null,isFred:false};
+
+  conn.on('open', ()=>{
+    // Send our player info
+    conn.send({type:'hello', name:player.name, photo:player.photo});
+  });
+
+  conn.on('data', data=>{
+    if(data.type==='hello'){
+      // Opponent connected — start the game
+      const oppPlayer={id:'online-opp',name:data.name||'Opponent',photo:data.photo||null,isFred:false};
+      const white = myColor==='white'?player:oppPlayer;
+      const black = myColor==='black'?player:oppPlayer;
+      document.getElementById('onlineModal').classList.remove('open');
+      startGame({
+        mode:'online', players:{white,black},
+        onlineMyColor:myColor,
+        botColor:null, botDepth:0,
+        fredAutoplay:false,
+        boardFlipped:myColor==='black'
+      });
+    }
+    else if(data.type==='move'&&S.mode==='online'){
+      // Receive opponent move
+      const {fr,fc,tr,tc,md,promo}=data;
+      S.selected=null; S.validMoves=[];
+      doMove(fr,fc,tr,tc,md||{},promo||null,true);
+    }
+    else if(data.type==='resign'&&S.mode==='online'){
+      S.gameOver=true;
+      showResult('RESIGN',S.onlineMyColor.toUpperCase()+' WINS',S.players[S.onlineMyColor].name);
+    }
+  });
+
+  conn.on('close',()=>{
+    if(!S.gameOver&&S.mode==='online'){
+      document.getElementById('onlineStatusText').textContent='DISCONNECTED';
+      document.getElementById('onlineStatusBar').style.display='flex';
+    }
+  });
+}
+
+function onlineSendMove(moveObj){
+  if(S.conn&&S.conn.open&&S.mode==='online'){
+    S.conn.send({type:'move',...moveObj});
+  }
+}
+
+function cleanupOnline(){
+  if(S.conn){ try{S.conn.close();}catch(e){} S.conn=null; }
+  if(S.peer){ try{S.peer.destroy();}catch(e){} S.peer=null; }
 }
 </script>
 </body>
